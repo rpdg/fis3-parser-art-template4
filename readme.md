@@ -1,5 +1,6 @@
-# fis3-parser-art-template4
+# fis3-parser-art-template4 ![NPM version](https://badge.fury.io/js/fis3-parser-art-template4.png)
 
+[![NPM Download](https://nodei.co/npm-dl/fis3-parser-art-template4.png?months=1)](https://www.npmjs.org/package/fis3-parser-art-template4)
 
 > artTemplate v4 的FIS编译插件。参考了 [https://github.com/lwdgit/fis-parser-art-template](https://github.com/lwdgit/fis-parser-art-template)
 
