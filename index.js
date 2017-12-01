@@ -116,11 +116,20 @@ function readGlobalConfig(file, conf) { //读取全局配置 config.json
 
 function initEngine(options) {
 
-	if (options.minimize !== undefined) {
+	if (options.minimize === true) {
 		template.defaults.minimize = options.minimize;
 	}
-	if (options.rules !== undefined) {
-		template.defaults.rules = options.rules;
+
+	if (options.compileDebug === true) {
+		template.defaults.compileDebug = options.compileDebug;
+	}
+
+	if (options.escape === false) {
+		template.defaults.escape = options.escape;
+	}
+
+	if (options.cache === false) {
+		template.defaults.cache = options.cache;
 	}
 
 	template.defaults.root = options.root ? options.root : fis.project.getProjectPath();
@@ -183,7 +192,7 @@ function render(file, data) {
 
 	template.dependencies = []; //增加dependencies,用于记录文件依赖
 
-	data['__fis_file'] = file;
+	data['$file'] = file;
 
 
 	var content = template(file.fullname, data);
@@ -216,12 +225,12 @@ module.exports = function (content, file, options) {
 
 	var data = readConfig(file);
 
-	if (data.release === false) { //如果不release,将文件丢到.deleted,并添加clean标记,在release:end后清除
+	if (data['$release'] === false) { //如果不release,将文件丢到.deleted,并添加clean标记,在release:end后清除
 		needClean = true;
 		file.release = deletedFileName;
 	}
 
 	if (!content || content.trim() === '') return '';
 
-	return data.noParse === true ? content : render(file, data);
+	return data['$noParse'] === true ? content : render(file, data);
 };

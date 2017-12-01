@@ -2,7 +2,7 @@
 
 [![NPM Download](https://nodei.co/npm-dl/fis3-parser-art-template4.png?months=1)](https://www.npmjs.org/package/fis3-parser-art-template4)
 
-> artTemplate v4 的FIS编译插件。参考了 [https://github.com/lwdgit/fis-parser-art-template](https://github.com/lwdgit/fis-parser-art-template)
+> artTemplate v4 的FIS编译插件，支持模板继承，并增强了内置变量。
 
 ## 安装
 ```bash
@@ -31,11 +31,14 @@ fis.match('**/*.html', {
  * 和模版同名的json文件，即test.json对应为test.tpl的数据
  * 工程目录下的config.json，该数据为全局配置，可以对应多个模版文件
  * fis-config中插件的`define`字段
-> 从上至下优先级依次递减
+ *
 
-> noParse: false表示不解析该文件，原样输出；
-
-> release: false表示不输入该文件
+## Art-template内置变量增强 ##
+> **$file**: FIS3的file变量，，在页面文件中，可以使用类似$file.filename 来取得文件名，或者其他file信息(如 $file.dirname, $file.ext)；
+> 
+> **$noParse**: true 表示不解析该文件，原样输出；
+> 
+> **$release**: false 表示不输出该文件
 
 
 
@@ -44,8 +47,9 @@ fis.match('**/*.html', {
 以上面`define`字段中配置说明：
 
 各级目录的配置一般会对应到每个文件。如果只指定了文件夹的数据，则该文件夹下的所有模板配有相同的数据。
-路径识别原则：以`/`结尾的识别为文件夹，key值带`.`的识别为文件。所以在自定义变量中请不要使用带`.`及以`/`结尾的变量
+路径识别原则：**以`/`结尾的识别为文件夹**，**key值带`.`的识别为文件**。所以在自定义变量中请不要使用带`.`及以`/`结尾的变量
 变量继承与覆盖原则：与js类似。数组会逐级延长。object类型则进行浅inherit
 
 
-
+## 鸣谢 ##
+插件开发参考了 [https://github.com/lwdgit/fis-parser-art-template](https://github.com/lwdgit/fis-parser-art-template)
