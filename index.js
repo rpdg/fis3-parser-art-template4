@@ -4,6 +4,9 @@ var template = require('art-template');
 var artRule = require('art-template/lib/compile/adapter/rule.art');
 var nativeRule = require('art-template/lib/compile/adapter/rule.native');
 
+
+
+
 var fs = require('fs'),
 	path = require('path');
 
@@ -79,6 +82,38 @@ function recursiveExtend(path, data) {
 	return recursiveExtend(path, data);
 }
 
+var LOCAL_MODULE = /^\.+\//;
+
+function resolveFilename(filename, options) {
+	console.warn(filename , LOCAL_MODULE.test(filename) , options);
+	//var path = require('path');
+	var root = options.root;
+	var extname = options.extname;
+
+	if (filename && filename.charAt('0') === '/') {
+		filename = path.join(template.defaults.root, filename);
+	}
+	else{
+		if (LOCAL_MODULE.test(filename)) {
+			var from = options.filename;
+			var self = !from || filename === from;
+			var base = self ? root : path.dirname(from);
+			filename = path.resolve(base, filename);
+		} else {
+			filename = path.resolve(root, filename);
+		}
+	}
+
+
+
+
+	if (!path.extname(filename)) {
+		filename = filename + extname;
+	}
+
+	return filename;
+}
+
 function readGlobalConfig(file, conf) { //读取全局配置 config.json
 
 	gData = {};
@@ -136,6 +171,10 @@ function initEngine(options) {
 
 
 	template.defaults.rules = [options.native ? nativeRule : artRule];
+
+
+	template.defaults.resolveFilename = resolveFilename;
+
 
 
 	if (!hasLoaded) {

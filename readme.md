@@ -13,9 +13,8 @@
 ```javascript
 fis.match('**/*.html', {
    parser: fis.plugin('art-template4', {
-      native: true,
-      //root: 'some-other-path',
-      //inimize: true,  
+      native: true,//默认为false，即简单语法模式
+      //minimize: true,  
       define: {
          pageTitle: 'ITB'
       }
@@ -31,14 +30,12 @@ fis.match('**/*.html', {
  * 和模版同名的json文件，即test.json对应为test.tpl的数据
  * 工程目录下的config.json，该数据为全局配置，可以对应多个模版文件
  * fis-config中插件的`define`字段
- *
+ 
 
 ## Art-template内置变量增强 ##
-> **$file**: FIS3的file变量，，在页面文件中，可以使用类似$file.filename 来取得文件名，或者其他file信息(如 $file.dirname, $file.ext)；
-> 
-> **$noParse**: true 表示不解析该文件，原样输出；
-> 
-> **$release**: false 表示不输出该文件
+* **$file**: FIS3的file变量，在页面文件中，可以使用类似$file.filename 来取得文件名，或者其他file信息(如 $file.dirname, $file.ext)，详见[http://fis.baidu.com/fis3/api/fis.file-File.html](http://fis.baidu.com/fis3/api/fis.file-File.html "FIS3文档")；
+* **$noParse**: true 表示不解析该文件，原样输出；
+* **$release**: false 表示不输出该文件
 
 
 
