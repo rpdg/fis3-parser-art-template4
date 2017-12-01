@@ -85,7 +85,7 @@ function recursiveExtend(path, data) {
 var LOCAL_MODULE = /^\.+\//;
 
 function resolveFilename(filename, options) {
-	console.warn(filename , LOCAL_MODULE.test(filename) , options);
+	//console.warn(filename , LOCAL_MODULE.test(filename) , options);
 	//var path = require('path');
 	var root = options.root;
 	var extname = options.extname;
