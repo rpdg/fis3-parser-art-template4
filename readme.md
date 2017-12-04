@@ -48,5 +48,11 @@ fis.match('**/*.html', {
 变量继承与覆盖原则：与js类似。数组会逐级延长。object类型则进行浅inherit
 
 
+## 针对ArtTemplate的hack
+
+ * 原版的artTemplate简洁语法模式不支持赋值操作，在本插件中对其进行了这方面的增强，使得数据可以使用赋值操作进行再分配。
+ * 针对fis增加了对绝对路径的支持，即所有模板都可以以工程目录为根目录进行include。
+
+
 ## 鸣谢 ##
 插件开发参考了 [https://github.com/lwdgit/fis-parser-art-template](https://github.com/lwdgit/fis-parser-art-template)
