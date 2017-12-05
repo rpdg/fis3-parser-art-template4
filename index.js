@@ -3,9 +3,7 @@
 var template = require('art-template');
 var artRule = require('art-template/lib/compile/adapter/rule.art');
 var nativeRule = require('art-template/lib/compile/adapter/rule.native');
-
-
-
+var runtime = require('art-template/lib/runtime');
 
 var fs = require('fs'),
 	path = require('path');
@@ -93,7 +91,7 @@ function resolveFilename(filename, options) {
 	if (filename && filename.charAt('0') === '/') {
 		filename = path.join(template.defaults.root, filename);
 	}
-	else{
+	else {
 		if (LOCAL_MODULE.test(filename)) {
 			var from = options.filename;
 			var self = !from || filename === from;
@@ -103,8 +101,6 @@ function resolveFilename(filename, options) {
 			filename = path.resolve(root, filename);
 		}
 	}
-
-
 
 
 	if (!path.extname(filename)) {
@@ -169,12 +165,17 @@ function initEngine(options) {
 
 	template.defaults.root = options.root ? options.root : fis.project.getProjectPath();
 
-
 	template.defaults.rules = [options.native ? nativeRule : artRule];
-
 
 	template.defaults.resolveFilename = resolveFilename;
 
+	if(options.filter){
+		for(var key in options.filter){
+			if(options.filter.hasOwnProperty(key) && typeof options.filter[key] === 'function'){
+				template.defaults.imports[key] = options.filter[key];
+			}
+		}
+	}
 
 
 	if (!hasLoaded) {

@@ -1,12 +1,16 @@
-console.log(JSON.stringify(fis))
-
 fis.match('**/*.html', {
 	parser: fis.plugin('art-template4', {
-		native: true,
-		//root: 'e:/www/',
-		//minimize: true,
+		native: false,
+		//root: 'some-other-path',
+		minimize: true,
+		filter: {
+			timestamp: function (str) {
+				return str + '-' + (new Date()).getTime()
+			}
+		},
 		define: {
-			pageTitle: 'ITB',
+			pageTitle: 'ITB'
 		}
-	})
+	}),
+	rExt: 'aspx'
 });

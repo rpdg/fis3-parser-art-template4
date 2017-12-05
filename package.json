@@ -1,6 +1,6 @@
 {
 	"name": "fis3-parser-art-template4",
-	"version": "1.4.15",
+	"version": "1.4.16",
 	"description": "art-template V4 parser for fis3",
 	"main": "index.js",
 	"directories": {

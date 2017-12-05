@@ -1,7 +1,28 @@
-{{extend 'comm/lay.html'}}
+{{extend '/comm/lay.art'}}
 
 {{block 'head'}}
 <link rel="stylesheet" href="custom.css">
+<script>
+	console.log(new Date());
+	console.warn(new Date());
+
+	var o = (function (n) {
+		var obj = {
+			a : 'aaa',
+			b: 'bbb',
+			n : n
+		};
+		obj.ver = Math.random();
+		return obj;
+	})(n);
+
+	console.log(o);
+
+</script>
+
+
+ss {{'opg'| timestamp }}
+
 {{/block}}
 
 {{block 'content'}}
