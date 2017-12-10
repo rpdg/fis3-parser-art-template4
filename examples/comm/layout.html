@@ -4,10 +4,13 @@
 	<meta charset="utf-8">
 	<title>{{pageTitle}}</title>
 	{{block 'head'}}
-	<link rel="stylesheet" href="main.css">
 	{{/block}}
 </head>
 <body>
 {{block 'content'}}{{/block}}
+
+<script>
+	console.log('file: {{$file.filename}}');
+</script>
 </body>
 </html>
