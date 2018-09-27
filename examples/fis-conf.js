@@ -1,16 +1,26 @@
-fis.match('**/*.html', {
+fis.match('*.html', {
 	parser: fis.plugin('art-template4', {
-		native: false,
-		//root: 'some-other-path',
-		minimize: true,
+		native: false, //default is false
 		filter: {
-			timestamp: function (str) {
+			'timestamp': function (str) {
 				return str + '-' + (new Date()).getTime()
 			}
 		},
 		define: {
-			pageTitle: 'ITB'
+			pageTitle: 'ITB',
+			someDataObject: [1,2],
+			currentLanguage: "cn",
+			'sub/': {
+				pageTitle: 'Sub Pages',
+				'p2.html': {
+					pageTitle: 'Page P2'
+				}
+			}
 		}
-	}),
-	rExt: 'aspx'
+	})
+});
+
+
+fis.match('{/comm/*.*,*.json}', {
+	release: false
 });

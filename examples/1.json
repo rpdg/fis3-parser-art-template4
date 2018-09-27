@@ -1,3 +1,7 @@
 {
-	"pageTitle": "page1"
+	"pageTitle": "title from 1.json",
+	"i18n":{
+		"cn":"中文",
+		"en":"Eng"
+	}
 }

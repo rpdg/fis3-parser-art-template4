@@ -11,15 +11,19 @@
 
 ## 配置
 ```javascript
-fis.match('**/*.html', {
+fis.match('*.html', {
    parser: fis.plugin('art-template4', {
       native: true,//默认为false，即简单语法模式
-      //minimize: true,  
       define: {
-         pageTitle: 'ITB'
+         pageTitle: 'ITB',
+         'sub/': {
+              pageTitle: 'Sub Pages',
+              'p2.html': {
+                   pageTitle: 'Page P2'
+              }
+          }
       }
-  }),
-  rExt: 'aspx' 
+  })
 });
 ```
 
@@ -27,9 +31,9 @@ fis.match('**/*.html', {
 
 为了让模版文件和数据分离，本插件对art-template的数据收集进行了三种形式的存放。
 
- * 和模版同名的json文件，即test.json对应为test.tpl的数据
- * 工程目录下的config.json，该数据为全局配置，可以对应多个模版文件
- * fis-config中插件的`define`字段
+ * 同目录下同名的json文件，即test.json对应为test.html的数据；
+ * 工程目录下的config.json，该数据为全局配置；
+ * fis-config中插件的`define`字段。
  
 
 ## Art-template内置变量增强 ##
@@ -50,7 +54,6 @@ fis.match('**/*.html', {
 
 ## 针对ArtTemplate的hack
 
- * 原版的artTemplate简洁语法模式不支持赋值操作，在本插件中对其进行了这方面的增强，使得数据可以使用赋值操作进行再分配。
  * 针对fis增加了对绝对路径的支持，即所有模板都可以以工程目录为根目录进行include。
 
 

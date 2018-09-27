@@ -1,1 +1,18 @@
-<%=pageTitle[1]%> native 
+{{extend '/comm/layout.html'}}
+
+{{block 'head'}}
+<script>
+	console.log(new Date());
+</script>
+
+{{/block}}
+
+
+{{block 'content'}}
+
+
+page title from global define in fis-conf.js
+
+filter timestamp: {{'opg'| timestamp }}
+
+{{/block}}
