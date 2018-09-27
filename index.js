@@ -259,6 +259,8 @@ function render(file, data) {
 
 module.exports = function (content, file, options) {
 
+	if(!file.isHtmlLike) return content;
+
 	initEngine(options);
 
 	readGlobalConfig(file, options);

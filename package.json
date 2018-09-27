@@ -1,16 +1,16 @@
 {
 	"name": "fis3-parser-art-template4",
-	"version": "1.4.16",
+	"version": "1.4.31",
 	"description": "art-template V4 parser for fis3",
 	"main": "index.js",
 	"directories": {
 
 	},
 	"dependencies": {
-		"art-template": "^4.12.2"
+		"art-template": "^4.13.1"
 	},
 	"devDependencies": {
-		"fis3": "^3.4.25"
+		"fis3": "^3.4.38"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
