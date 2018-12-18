@@ -1,34 +1,37 @@
 {
-	"name": "fis3-parser-art-template4",
-	"version": "1.4.31",
-	"description": "art-template V4 parser for fis3",
-	"main": "index.js",
-	"directories": {
-
-	},
-	"dependencies": {
-		"art-template": "^4.13.1"
-	},
-	"devDependencies": {
-		"fis3": "^3.4.38"
-	},
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+ssh://git@github.com/rpdg/fis3-parser-art-template4.git"
-	},
-	"keywords": [
-		"fis",
-		"fis3",
-		"art-template",
-		"template"
-	],
-	"author": "Lyu PF",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/rpdg/fis3-parser-art-template4/issues"
-	},
-	"homepage": "https://github.com/rpdg/fis3-parser-art-template4#readme"
+    "author": {
+        "name": "Lyu PF"
+    },
+    "bugs": {
+        "url": "https://github.com/rpdg/fis3-parser-art-template4/issues"
+    },
+    "dependencies": {
+        "art-template": "^4.13.2",
+        "jsonfile": "^5.0.0"
+    },
+    "deprecated": false,
+    "description": "art-template V4 parser for fis3",
+    "devDependencies": {
+        "@types/jsonfile": "^4.0.1"
+    },
+    "directories": {},
+    "homepage": "https://github.com/rpdg/fis3-parser-art-template4#readme",
+    "keywords": [
+        "fis",
+        "fis3",
+        "art-template",
+        "template"
+    ],
+    "license": "MIT",
+    "main": "index.js",
+    "name": "fis3-parser-art-template4",
+    "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/rpdg/fis3-parser-art-template4.git"
+    },
+    "scripts": {
+        "build": "tsc",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "version": "1.4.32"
 }
