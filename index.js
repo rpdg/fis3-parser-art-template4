@@ -1,11 +1,12 @@
 "use strict";
+///
 var template = require("art-template");
 var fs = require("fs");
 var path = require("path");
 var jsonfile = require("jsonfile");
+var deepmerge = require("deepmerge");
 var artRule = require("art-template/lib/compile/adapter/rule.art");
 var nativeRule = require("art-template/lib/compile/adapter/rule.native");
-var runtime = require("art-template/lib/runtime");
 var LOCAL_MODULE = /^\.+\//;
 function resolveFilename(filename, options) {
     //console.warn(filename , LOCAL_MODULE.test(filename) , options);
@@ -31,36 +32,13 @@ function resolveFilename(filename, options) {
     }
     return filename;
 }
-function extend(oldObj, newObj, override, combine) {
-    if (typeof oldObj === "object" && typeof newObj === "object") {
-        for (var o in newObj) {
-            if (typeof oldObj[o] !== "undefined") {
-                if (combine && oldObj[o] instanceof Array) {
-                    oldObj[o] = newObj[o].concat(oldObj[o]);
-                }
-                if (override === true) {
-                    oldObj[o] = newObj[o];
-                }
-            }
-            else {
-                if (combine && oldObj[o] instanceof Array) {
-                    oldObj[o] = newObj[o].concat(oldObj[o]);
-                }
-                else {
-                    oldObj[o] = newObj[o];
-                }
-            }
-        }
-    }
-    else {
-        return oldObj || newObj || {};
-    }
-    return oldObj;
-}
 var isInited = false;
 var needClean = false;
 var deletedFileName = "/.deleted";
-// 插件载入时的初始化
+/**
+ * 插件载入时的初始化
+ * @param options 在fis-conf.json 定义的模板配置
+ */
 function initEngine(options) {
     if (options.minimize === true) {
         template.defaults.minimize = options.minimize;
@@ -75,11 +53,27 @@ function initEngine(options) {
         template.defaults.cache = options.cache;
     }
     template.defaults.root = options.root ? options.root : fis.project.getProjectPath();
-    template.defaults.rules = [options.native ? nativeRule : artRule];
+    //
+    template.defaults.rules = [];
+    if (options.rules && options.rules.length) {
+        var l = options.rules.length;
+        while (l--) {
+            template.defaults.rules.push(options.rules[l]);
+        }
+    }
+    if (options.native) {
+        template.defaults.rules.push(nativeRule);
+    }
+    if (options.art) {
+        template.defaults.rules.push(artRule);
+    }
+    if (!template.defaults.rules.length) {
+        template.defaults.rules.push(artRule);
+    }
     template.defaults.resolveFilename = resolveFilename;
     if (options.imports) {
         for (var key in options.imports) {
-            if (options.imports.hasOwnProperty(key) && typeof options.imports[key] === "function") {
+            if (typeof options.imports[key] === "function") {
                 template.defaults.imports[key] = options.imports[key];
             }
         }
@@ -100,69 +94,10 @@ function initEngine(options) {
         needClean = false;
     });
 }
-//使用全局变量是为了防止Obj也被递归
-var Obj = {};
-//将对象降维
-function listObj(key, obj) {
-    //console.log(key);
-    if ((key && !/\/$/.test(key)) || key.indexOf(".") > -1 || /_defaults$/.test(key)) {
-        return obj;
-    }
-    key = key ? key : "";
-    for (var i in obj) {
-        if (!/_defaults$/.test(i) && Object.prototype.toString.call(obj[i]) !== "[object Object]") {
-            if (key) {
-                Obj[key + "_defaults"] = Obj[key + "_defaults"] || {};
-                Obj[key + "_defaults"][i] = obj[i];
-            }
-            else {
-                Obj["_defaults"] = Obj["_defaults"] || {};
-                Obj["_defaults"][i] = obj[i];
-            }
-            //console.log(i);
-        }
-        else {
-            var value = listObj(key + i, obj[i]);
-            if (value !== undefined) {
-                if (typeof value !== "object") {
-                    Obj[key + i] = value;
-                }
-                else {
-                    Obj[key + i] = extend(Obj[key + i], value, true, true);
-                }
-            }
-        }
-    }
-    return undefined;
-}
-function recursiveExtend(path, data) {
-    if (path === "") {
-        return extend(data, gData["_defaults"], false, true);
-    }
-    data = extend(data, gData[path + "/_defaults"], false, true);
-    path = path.substr(0, path.lastIndexOf("/"));
-    return recursiveExtend(path, data);
-}
-var gData = {};
-// 读取全局配置 config.json
-function readGlobalData(file) {
-    var gCfgJsonFile = fis.project.getProjectPath() + "/config.json";
-    var gCfgData;
-    if (fs.existsSync(gCfgJsonFile)) {
-        gCfgData = jsonfile.readFileSync(gCfgJsonFile);
-        Obj = {};
-        listObj('', gCfgData);
-        gCfgData = Obj;
-        extend(gData, gCfgData, false, true);
-        file.cache.addDeps(gCfgJsonFile); //移除全局配置编译依赖
-    }
-    else {
-        //throw new Error(gJsonFile + ' not exists!');
-        gCfgData = {};
-    }
-    extend(gData, gCfgData, false, true);
-}
-//读取同名json配置
+/**
+ * 读取同名json配置
+ * @param file 模板文件
+ */
 function readConfig(file) {
     var jsonFile = file.realpathNoExt + ".json";
     var data;
@@ -172,37 +107,117 @@ function readConfig(file) {
     }
     else {
         data = {};
+        file.cache.addMissingDeps(jsonFile);
     }
-    //extend(true , data, gData);
-    data = recursiveExtend(file.id, extend(data, gData[file.id], false, false));
     return data;
 }
+/**
+ * 将全局data合并到单文件的data中
+ * @param subpath 文件物理路径
+ * @param localData 文件同名json的data
+ * @param globalData 全局data
+ */
+function mergeGlobalData(subpath, localData, globalData) {
+    var mergeData = [];
+    var props = [];
+    var subs = subpath.split("/");
+    for (var i = 0, l = subs.length; i < l; i++) {
+        var p = (i ? props[i - 1] : "") + subs[i] + (i > l - 2 ? "" : "/");
+        props.push(p);
+    }
+    for (var i = 0, l = props.length; i < l; i++) {
+        var obj = globalData[props[i]];
+        if (obj !== undefined) {
+            mergeData.push(obj);
+        }
+    }
+    mergeData.push(localData);
+    var data = deepmerge.all(mergeData);
+    return data;
+}
+/**
+ * 渲染模板最终数据
+ * @param file 模板文件
+ * @param data 渲染数据
+ * @returns 渲染结果
+ */
 function render(file, data) {
-    data = data || {};
-    template.dependencies = []; //增加dependencies,用于记录文件依赖
-    data['$file'] = file;
+    //template.dependencies = []; //增加dependencies,用于记录文件依赖
+    if (data === void 0) { data = {}; }
     var content = template(file.fullname, data);
-    if (template.dependencies.length) { //如果有include,将被include的文件加入deps
-        template.dependencies.forEach(function (cp) {
+    /*if (template.dependencies.length) { //如果有include,将被include的文件加入deps
+
+        template.dependencies.forEach(function (cp : any) {
             file.cache.addDeps(cp);
         });
-    }
-    if (content.indexOf('{Template Error}') === -1) {
-        return content.replace(/([\n\r])(\s*)\1/g, '$1$1');
+
+    }*/
+    if (content.indexOf("{Template Error}") === -1) {
+        return content;
+        //return content.replace(/([\n\r])(\s*)\1/g, "$1$1");
     }
     else {
-        console.log(file + ' render Error!');
-        return '<!doctype html>\r\n<html>\r\n\t<head>\r\n\t\t<title>Template Error</title>\r\n\t</head>\r\n\t<body>' + content + '\r\n\t</body>\r\n</html>';
+        console.log(file + " render Error!");
+        return ("<!doctype html>\r\n<html>\r\n\t<head>\r\n\t\t<title>Template Error</title>\r\n\t</head>\r\n\t<body>" +
+            content +
+            "\r\n\t</body>\r\n</html>");
+    }
+}
+var globalConfigFile = fis.project.getProjectPath() + "/config.json";
+var globalConfigFileExisted = fs.existsSync(globalConfigFile);
+//使用全局变量是为了防止Obj也被递归
+var Obj = {};
+/**
+ * 读取全局配置 config.json
+ * @param definedData 在fis-conf.json 里定义的data
+ */
+function readGlobalData(definedData, file) {
+    if (definedData === void 0) { definedData = {}; }
+    var data;
+    if (globalConfigFileExisted) {
+        file.cache.addDeps(globalConfigFile); //添加编译依赖
+        var gCfgData = jsonfile.readFileSync(globalConfigFile);
+        data = deepmerge(definedData, gCfgData);
+    }
+    else {
+        file.cache.addMissingDeps(globalConfigFile);
+        data = definedData;
+    }
+    reduceObject("", Obj, data);
+    return data;
+}
+/**
+ * 将数据降维展开
+ * @param jsonPath
+ * @param targetObject
+ * @param srcObject
+ */
+function reduceObject(jsonPath, targetObject, srcObject) {
+    var targetDefaultPath = jsonPath.replace(/\/$/, "") + "/";
+    if (targetObject[targetDefaultPath] === undefined) {
+        targetObject[targetDefaultPath] = {};
+    }
+    for (var key in srcObject) {
+        if (/\/$/.test(key)) {
+            reduceObject(targetDefaultPath + key, targetObject, srcObject[key]);
+        }
+        else if (key.indexOf(".") > -1) {
+            targetObject[targetDefaultPath + key] = srcObject[key];
+        }
+        else {
+            targetObject[targetDefaultPath][key] = srcObject[key];
+        }
     }
 }
 module.exports = function (content, file, options) {
+    if (!content || content.trim() === "")
+        return "";
     if (!file.isHtmlLike)
         return content;
     if (!isInited) {
-        gData = options.define || {};
+        readGlobalData(options.define, file);
         delete options.define;
         initEngine(options);
-        readGlobalData(file);
         isInited = true;
     }
     var data = readConfig(file);
@@ -210,12 +225,14 @@ module.exports = function (content, file, options) {
         //如果不release,将文件丢到.deleted,并添加clean标记,在release:end后清除
         needClean = true;
         file.release = deletedFileName;
+        return "";
     }
     if (data["$noParse"] === true) {
         return content;
     }
-    if (!content || content.trim() === "") {
-        return "";
-    }
+    data = mergeGlobalData(file.subpath, data, Obj);
+    // 加入内置的file变量
+    data["$file"] = file;
     return render(file, data);
 };
+//# sourceMappingURL=index.js.map

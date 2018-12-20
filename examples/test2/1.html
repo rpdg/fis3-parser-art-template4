@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="cache-control" content="max-age=0" />
+	</head>
+	<body>
+		{{block 'content'}}
+			{{projectName}}
+			${title}
+
+			{{@ object2 | JSON.stringify}}
+			
+			<% for(var i = 0; i < lists.length; i++){ %>
+				<%= i %> ${lists[i]}
+			<% } %>
+
+			{{raw}}
+				{{projectName}} <%=projectName%>
+			{{/raw}}
+		{{/block}}
+		{{block 'more'}}
+		{{/block}}
+	</body>
+</html>

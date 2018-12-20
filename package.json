@@ -1,37 +1,43 @@
 {
-    "author": {
-        "name": "Lyu PF"
-    },
-    "bugs": {
-        "url": "https://github.com/rpdg/fis3-parser-art-template4/issues"
-    },
-    "dependencies": {
-        "art-template": "^4.13.2",
-        "jsonfile": "^5.0.0"
-    },
-    "deprecated": false,
-    "description": "art-template V4 parser for fis3",
-    "devDependencies": {
-        "@types/jsonfile": "^4.0.1"
-    },
-    "directories": {},
-    "homepage": "https://github.com/rpdg/fis3-parser-art-template4#readme",
-    "keywords": [
-        "fis",
-        "fis3",
-        "art-template",
-        "template"
-    ],
-    "license": "MIT",
-    "main": "index.js",
-    "name": "fis3-parser-art-template4",
-    "repository": {
-        "type": "git",
-        "url": "git+ssh://git@github.com/rpdg/fis3-parser-art-template4.git"
-    },
-    "scripts": {
-        "build": "tsc",
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "version": "1.4.32"
+	"author": {
+		"name": "Lyu PF"
+	},
+	"bugs": {
+		"url": "https://github.com/rpdg/fis3-parser-art-template4/issues"
+	},
+	"dependencies": {
+		"art-template": "^4.13.2",
+		"deepmerge": "^3.0.0",
+		"jsonfile": "^5.0.0"
+	},
+	"deprecated": false,
+	"description": "art-template V4 parser for fis3",
+	"devDependencies": {
+		"@types/deepmerge": "^2.2.0",
+		"@types/jsonfile": "^5.0.0"
+	},
+	"directories": {},
+	"engines": {
+		"node": ">= 4.0.0"
+	},
+	"homepage": "https://github.com/rpdg/fis3-parser-art-template4#readme",
+	"keywords": [
+		"fis",
+		"fis3",
+		"art-template",
+		"template"
+	],
+	"license": "MIT",
+	"main": "index.js",
+	"name": "fis3-parser-art-template4",
+	"repository": {
+		"type": "git",
+		"url": "git+ssh://git@github.com/rpdg/fis3-parser-art-template4.git"
+	},
+	"scripts": {
+		"build": "tsc",
+		"debug": "node --inspect=12333 --inspect-brk C://Users//administrator//AppData//Roaming//npm//node_modules//fis3//bin//fis.js release dev -cd ./dist",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"version": "1.4.33"
 }

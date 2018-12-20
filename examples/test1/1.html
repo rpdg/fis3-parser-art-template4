@@ -1,0 +1,36 @@
+{{extend '/comm/layout.html'}}
+
+{{block 'head'}}
+<script>
+	console.log({{someDataObject}});
+	console.log('{{i18n[currentLanguage]}}');
+</script>
+
+{{/block}}
+
+
+{{block 'content'}}
+
+	page title from 1.json
+	{{pageTitle}}
+	<%=pageTitle%>
+
+
+	用混合语法遍历数组
+	<% for(var i = 0; i < someDataObject.length; i++){ %>
+		<%= i %> : ${someDataObject[i]}
+	<% } %>
+
+
+
+	filter timestamp: {{'itb'| timestamp }}
+
+	自定义语法：
+	${pageTitle}
+
+	原文输出语法控制符：
+	{{raw}}
+		{{pageTitle}} <%=pageTitle%>
+	{{/raw}}
+
+{{/block}}

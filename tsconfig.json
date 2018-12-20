@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "commonjs",
+        "moduleResolution": "node",
+		"declaration": true,
+		"outDir": ".",
+        "strict": true,
+        "sourceMap": true
+	},
+	"include": ["src"],
+	"exclude": ["**/*.history"]
+}

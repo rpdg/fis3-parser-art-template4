@@ -1,0 +1,11 @@
+{
+	"title": "title1 -define in json",
+	"page/": {
+		"title": "title2 -define in json"
+	},
+	"object2": {
+		"id": 1,
+		"name": "objectName"
+	},
+	"lists": [21, 22, 23]
+}
