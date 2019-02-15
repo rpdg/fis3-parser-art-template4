@@ -72,7 +72,7 @@ fis.match('*.html', {
 ## Art-template内置变量增强 ##
 * **$file**: FIS3的file变量，在页面文件中，可以使用类似$file.filename 来取得文件名，或者其他file信息(如 $file.dirname, $file.ext)，详见[http://fis.baidu.com/fis3/api/fis.file-File.html](http://fis.baidu.com/fis3/api/fis.file-File.html "FIS3文档")。
 当项目需要按照文件路径的某些规则，编译对应数据变量进页面的时候非常有用；也可用于自动include某些资源，如文件同名的js等。
-
+* **$media**: FIS3打包时的project.currentMedia值（一般为dev、prd等），可用于在不同的打包环境下插入不同的代码片段。
 
 
 ## 全局data分配原则
