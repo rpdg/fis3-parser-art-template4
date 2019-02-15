@@ -7,14 +7,12 @@
 	},
 	"dependencies": {
 		"art-template": "^4.13.2",
-		"deepmerge": "^3.0.0",
-		"jsonfile": "^5.0.0"
+		"deepmerge": "^3.1.0"
 	},
 	"deprecated": false,
 	"description": "art-template V4 parser for fis3",
 	"devDependencies": {
-		"@types/deepmerge": "^2.2.0",
-		"@types/jsonfile": "^5.0.0"
+		"@types/deepmerge": "^2.2.0"
 	},
 	"directories": {},
 	"engines": {
@@ -36,8 +34,7 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"debug": "node --inspect=12333 --inspect-brk C://Users//administrator//AppData//Roaming//npm//node_modules//fis3//bin//fis.js release dev -cd ./dist",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
-	"version": "1.4.33"
+	"version": "1.4.35"
 }

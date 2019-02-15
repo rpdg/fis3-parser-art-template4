@@ -2,40 +2,10 @@
 import * as template from "art-template";
 import * as fs from "fs";
 import * as path from "path";
-import * as jsonfile from "jsonfile";
 import * as deepmerge from "deepmerge";
 
 const artRule = require("art-template/lib/compile/adapter/rule.art");
 const nativeRule = require("art-template/lib/compile/adapter/rule.native");
-
-type FisFile = {
-	fullname: string;
-	id: string;
-	isHtmlLike: boolean;
-	realpathNoExt: string;
-	subpath: string;
-	cache: any;
-	release: string | boolean;
-};
-
-type ArtOption = {
-	define?: any;
-	filename: string;
-	extname: string;
-	minimize: boolean;
-	cache: boolean;
-	compileDebug: boolean;
-	escape: boolean;
-	root: string;
-	rules: any[];
-	resolveFilename: any;
-	imports: { [key: string]: Function };
-	native: boolean;
-	art: boolean;
-};
-
-
-type KeyValueObject = { [k: string]: any };
 
 
 
@@ -72,30 +42,21 @@ let needClean: boolean = false;
 const deletedFileName: string = "/.deleted";
 
 /**
- * 插件载入时的初始化
+ * 插件初始化
  * @param options 在fis-conf.json 定义的模板配置
  */
 function initEngine(options: ArtOption) {
-	if (options.minimize === true) {
-		template.defaults.minimize = options.minimize;
-	}
 
-	if (options.compileDebug === true) {
-		template.defaults.compileDebug = options.compileDebug;
-	}
+	template.defaults.root = options.root ? options.root : fis.project.getProjectPath();
+	template.defaults.resolveFilename = resolveFilename;
 
-	if (options.escape === false) {
+	if (typeof options.escape === 'boolean') {
 		template.defaults.escape = options.escape;
 	}
 
-	if (options.cache === false) {
-		template.defaults.cache = options.cache;
-	}
-
-	template.defaults.root = options.root ? options.root : fis.project.getProjectPath();
 
 	//
-	template.defaults.rules = [];
+	template.defaults.rules.length = 0;
 	if (options.rules && options.rules.length) {
 		let l = options.rules.length;
 		while (l--) {
@@ -108,12 +69,11 @@ function initEngine(options: ArtOption) {
 	if (options.art) {
 		template.defaults.rules.push(artRule);
 	}
-	if (!template.defaults.rules.length) {
+	if (template.defaults.rules.length === 0) {
 		template.defaults.rules.push(artRule);
 	}
 
-	template.defaults.resolveFilename = resolveFilename;
-
+	//
 	if (options.imports) {
 		for (let key in options.imports) {
 			if (typeof options.imports[key] === "function") {
@@ -149,7 +109,8 @@ function readConfig(file: FisFile): any {
 	let data: any;
 
 	if (fs.existsSync(jsonFile)) {
-		data = jsonfile.readFileSync(jsonFile);
+		//data = jsonfile.readFileSync(jsonFile);
+		data = fis.util.readJSON(jsonFile);
 		file.cache.addDeps(jsonFile);
 	} else {
 		data = {};
@@ -167,15 +128,13 @@ function readConfig(file: FisFile): any {
  */
 function mergeGlobalData(subpath: string, localData: any, globalData: any): any {
 	let mergeData = [];
-	let props: string[] = [];
 	let subs = subpath.split("/");
-	for (let i = 0, l = subs.length; i < l; i++) {
-		let p = (i ? props[i - 1] : "") + subs[i] + (i > l - 2 ? "" : "/");
-		props.push(p);
-	}
 
-	for (let i = 0, l = props.length; i < l; i++) {
-		let obj = globalData[props[i]];
+	let propPath :string = '';
+	for (let i = 0, l = subs.length; i < l; i++) {
+
+		propPath = propPath + subs[i] + (i > l - 2 ? "" : "/");
+		let obj = globalData[propPath];
 		if (obj !== undefined) {
 			mergeData.push(obj);
 		}
@@ -193,10 +152,15 @@ function mergeGlobalData(subpath: string, localData: any, globalData: any): any 
  * @param data 渲染数据
  * @returns 渲染结果
  */
-function render(file: FisFile, data: any = {}): string {
+function render(src: string , file: FisFile, data: any = {}): string {
 	//template.dependencies = []; //增加dependencies,用于记录文件依赖
 
-	let content = template(file.fullname, data);
+	/**
+	 * 此处不可用 compile & render，会导致路径问题
+	//let renderer = template.compile(src);
+	//let content = renderer(data);
+	 */
+	let content = template(file.fullname , data);
 
 	/*if (template.dependencies.length) { //如果有include,将被include的文件加入deps
 
@@ -206,17 +170,7 @@ function render(file: FisFile, data: any = {}): string {
 
 	}*/
 
-	if (content.indexOf("{Template Error}") === -1) {
-		return content;
-		//return content.replace(/([\n\r])(\s*)\1/g, "$1$1");
-	} else {
-		console.log(file + " render Error!");
-		return (
-			"<!doctype html>\r\n<html>\r\n\t<head>\r\n\t\t<title>Template Error</title>\r\n\t</head>\r\n\t<body>" +
-			content +
-			"\r\n\t</body>\r\n</html>"
-		);
-	}
+	return content;
 }
 
 let globalConfigFile: string = fis.project.getProjectPath() + "/config.json";
@@ -233,7 +187,8 @@ function readGlobalData(definedData: any = {} , file:FisFile) {
 	let data: any;
 	if (globalConfigFileExisted) {
 		file.cache.addDeps(globalConfigFile); //添加编译依赖
-		let gCfgData = jsonfile.readFileSync(globalConfigFile);
+		//let gCfgData = jsonfile.readFileSync(globalConfigFile);
+		let gCfgData = fis.util.readJSON(globalConfigFile);
 		data = deepmerge(definedData, gCfgData);
 	} 
 	else {
@@ -254,6 +209,7 @@ function readGlobalData(definedData: any = {} , file:FisFile) {
  */
 function reduceObject(jsonPath: string, targetObject: any, srcObject: any): any {
 	const targetDefaultPath = jsonPath.replace(/\/$/, "") + "/";
+	
 	if (targetObject[targetDefaultPath] === undefined) {
 		targetObject[targetDefaultPath] = {};
 	}
@@ -261,9 +217,11 @@ function reduceObject(jsonPath: string, targetObject: any, srcObject: any): any 
 	for (let key in srcObject) {
 		if (/\/$/.test(key)) {
 			reduceObject(targetDefaultPath + key, targetObject, srcObject[key]);
-		} else if (key.indexOf(".") > -1) {
+		} 
+		else if (key.indexOf(".") > -1) {
 			targetObject[targetDefaultPath + key] = srcObject[key];
-		} else {
+		} 
+		else {
 			targetObject[targetDefaultPath][key] = srcObject[key];
 		}
 	}
@@ -300,6 +258,7 @@ export = function(content: string, file: FisFile, options: ArtOption): string {
 
 	// 加入内置的file变量
 	data["$file"] = file;
+	data['$media'] = fis.project.currentMedia();
 
-	return render(file, data);
+	return render(content , file, data);
 };

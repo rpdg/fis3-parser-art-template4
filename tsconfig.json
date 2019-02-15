@@ -3,8 +3,9 @@
 		"target": "es5",
 		"module": "commonjs",
         "moduleResolution": "node",
-		"declaration": true,
+		"declaration": false,
 		"outDir": ".",
+        "removeComments": true,
         "strict": true,
         "sourceMap": true
 	},
