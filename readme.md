@@ -8,7 +8,7 @@
 
 ## 安装
 ```bash
-> npm i -g git+https://git@github.com/rpdg/fis3-parser-art-template4.git
+> npm i -g git+ssh://git@github.com:rpdg/fis-parser-node-sass.git
 ```
 
 ## 配置
