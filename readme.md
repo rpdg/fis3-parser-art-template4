@@ -8,7 +8,7 @@
 
 ## 安装
 ```bash
-> npm install -g fis3-parser-art-template4
+> npm i -g git+https://git@github.com/rpdg/fis3-parser-art-template4.git
 ```
 
 ## 配置
