@@ -48,7 +48,7 @@ fis.match('*.html', {
       },
       // 自定义数据
       define: {
-         pageTitle: 'ITB',
+         pageTitle: 'Main page title',
          'sub/': {
               pageTitle: 'Sub Pages',
               'p2.html': {
